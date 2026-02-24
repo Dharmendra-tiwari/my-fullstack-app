@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function Home() {
+const Home = () => {
   const fakeTasks = [
     { id: 1, title: "Master Next.js App Router", completed: true },
     { id: 2, title: "Connect MongoDB with Mongoose", completed: false },
@@ -28,26 +28,28 @@ export default function Home() {
                   : "border-amber-500 bg-amber-50/80"
               }`}
             >
-              <div className="flex items-center justify-between">
-                <span
-                  className={`text-xl font-medium ${
-                    task.completed
-                      ? "line-through text-gray-500"
-                      : "text-gray-900"
-                  }`}
-                >
-                  {task.title}
-                </span>
-                <span
-                  className={`px-4 py-2 rounded-full text-sm font-semibold ${
-                    task.completed
-                      ? "bg-green-200 text-green-800"
-                      : "bg-amber-200 text-amber-800"
-                  }`}
-                >
-                  {task.completed ? "Done ✅" : "Pending ⏳"}
-                </span>
-              </div>
+              <Link href={`/tasks/${task.id}`}>
+                <div className="flex items-center justify-between">
+                  <span
+                    className={`text-xl font-medium ${
+                      task.completed
+                        ? "line-through text-gray-500"
+                        : "text-gray-900"
+                    }`}
+                  >
+                    {task.title}
+                  </span>
+                  <span
+                    className={`px-4 py-2 rounded-full text-sm font-semibold ${
+                      task.completed
+                        ? "bg-green-200 text-green-800"
+                        : "bg-amber-200 text-amber-800"
+                    }`}
+                  >
+                    {task.completed ? "Done ✅" : "Pending ⏳"}
+                  </span>
+                </div>
+              </Link>
             </li>
           ))}
         </ul>
@@ -64,4 +66,6 @@ export default function Home() {
       </div>
     </main>
   );
-}
+};
+
+export default Home;
