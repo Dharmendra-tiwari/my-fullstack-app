@@ -1,13 +1,18 @@
 import Link from "next/link";
+import { Task } from "./type/types";
 
-const Home = () => {
-  const fakeTasks = [
-    { id: 1, title: "Master Next.js App Router", completed: true },
-    { id: 2, title: "Connect MongoDB with Mongoose", completed: false },
-    { id: 3, title: "Build REST API with Express", completed: false },
-    { id: 4, title: "Add JWT Authentication", completed: false },
-    { id: 5, title: "Deploy full app to Vercel + Render", completed: false },
-  ];
+const Home = async () => {
+  const res = await fetch("http://localhost:3000/api/tasks", {
+    cache: 'no-store'
+  })
+
+  if (!res.ok) {
+    // optional: error handling
+    throw new Error('Failed to fetch tasks');
+  }
+
+  const tasks: Task[] = await res.json();
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 bg-gray-50">
       <h1 className="text-5xl md:text-6xl font-extrabold text-purple-700 mb-10 tracking-tight">
@@ -19,7 +24,7 @@ const Home = () => {
         </h2>
 
         <ul className="space-y-5">
-          {fakeTasks.map((task) => (
+          {tasks.map((task) => (
             <li
               key={task.id}
               className={`p-6 rounded-xl shadow-md border-l-6 transition-all hover:scale-102 ${
