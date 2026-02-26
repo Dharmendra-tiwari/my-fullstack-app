@@ -1,39 +1,6 @@
+import { Task } from "@/app/type/types";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-
-const fakeTasks = [
-  {
-    id: 1,
-    title: "Master Next.js App Router",
-    completed: true,
-    description:
-      "Pages vs App Router, Server Components, Client Components समझ लिया।",
-  },
-  {
-    id: 2,
-    title: "Connect MongoDB with Mongoose",
-    completed: false,
-    description: "Atlas अकाउंट बनाना, connection string सेट करना।",
-  },
-  {
-    id: 3,
-    title: "Build REST API with Express",
-    completed: false,
-    description: "Routes, middleware, controllers बनाना।",
-  },
-  {
-    id: 4,
-    title: "Add JWT Authentication",
-    completed: false,
-    description: "Login, signup, token generate और verify करना।",
-  },
-  {
-    id: 5,
-    title: "Deploy full app",
-    completed: false,
-    description: "Vercel पर frontend, Render/Heroku पर backend।",
-  },
-];
 
 const TaskDetailPage = async ({
   params,
@@ -42,9 +9,15 @@ const TaskDetailPage = async ({
 }) => {
   const resolvedParams = await params;
   const id = parseInt(resolvedParams.id);
-//   console.log("Dynamic route hit! ID from params:", resolvedParams.id);
+  const res = await fetch(`http://localhost:3000/api/tasks/${id}`, {
+    cache: "no-store",
+  });
 
-  const task = fakeTasks.find((t) => t.id === id);
+  if (!res.ok) {
+    notFound();
+  }
+
+  const task: Task = await res.json();
 
   if (!task) {
     notFound();
