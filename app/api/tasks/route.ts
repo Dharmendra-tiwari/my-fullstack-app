@@ -1,40 +1,42 @@
-import { Task } from "@/app/type/types";
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+import dbConnect from '@/lib/mongodb';
+import Task from '@/models/Tasks';
 
-const fakeTasks: Task[] = [
-  {
-    id: 1,
-    title: "Master Next.js App Router",
-    completed: true,
-    description:
-      "Pages vs App Router, Server Components, Client Components समझ लिया।",
-  },
-  {
-    id: 2,
-    title: "Connect MongoDB with Mongoose",
-    completed: false,
-    description: "Atlas अकाउंट बनाना, connection string सेट करना।",
-  },
-  {
-    id: 3,
-    title: "Build REST API with Express",
-    completed: false,
-    description: "Routes, middleware, controllers बनाना।",
-  },
-  {
-    id: 4,
-    title: "Add JWT Authentication",
-    completed: false,
-    description: "Login, signup, token generate और verify करना।",
-  },
-  {
-    id: 5,
-    title: "Deploy full app",
-    completed: false,
-    description: "Vercel पर frontend, Render/Heroku पर backend।",
-  },
-];
+export async function GET() {
+  try {
+    await dbConnect();
+    const tasks = await Task.find().sort({ createdAt: -1 });
+    return NextResponse.json(tasks);
+  } catch (error) {
+    console.error('Error fetching tasks:', error);
+    return NextResponse.json({ error: 'Failed to fetch tasks' }, { status: 500 });
+  }
+}
 
-export const GET = async () => {
-  return NextResponse.json(fakeTasks);
-};
+export async function POST(request: Request) {
+  try {
+    await dbConnect();
+
+    const body = await request.json();
+    const {title, description} = body;
+
+    if(!title){
+      return NextResponse.json({ error: 'Title is required' }, { status: 400 });
+    }
+
+    const newTask = new Task({
+      title,
+      description: description || '',
+      completed: false
+    })
+
+    await newTask.save();
+
+    return NextResponse.json(newTask, {status: 201})
+    
+  } catch (error) {
+    console.error("Error creating task:", error);
+    return NextResponse.json({error: 'Failed to create task'}, {status: 500})
+    
+  }
+}

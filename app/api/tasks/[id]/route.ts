@@ -1,59 +1,67 @@
-import { Task } from "@/app/type/types";
 import { NextResponse } from "next/server";
+import dbConnect from "@/lib/mongodb";
+import Task from "@/models/Tasks";
 
-const fakeTasks: Task[] = [
-  {
-    id: 1,
-    title: "Master Next.js App Router",
-    completed: true,
-    description:
-      "Pages vs App Router, Server Components, Client Components समझ लिया।",
-  },
-  {
-    id: 2,
-    title: "Connect MongoDB with Mongoose",
-    completed: false,
-    description: "Atlas अकाउंट बनाना, connection string सेट करना।",
-  },
-  {
-    id: 3,
-    title: "Build REST API with Express",
-    completed: false,
-    description: "Routes, middleware, controllers बनाना।",
-  },
-  {
-    id: 4,
-    title: "Add JWT Authentication",
-    completed: false,
-    description: "Login, signup, token generate और verify करना।",
-  },
-  {
-    id: 5,
-    title: "Deploy full app",
-    completed: false,
-    description: "Vercel पर frontend, Render/Heroku पर backend।",
-  },
-];
-
-export const GET = async (
+export async function GET(
   request: Request,
-  context: { params: Promise<{ id: string }> },
-) => {
-  const params = await context.params; // ← context से await करो
+  { params: paramsPromise }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const params = await paramsPromise;
+    const id = params.id;
+    await dbConnect();
 
-  const id = parseInt(params.id, 10);
+    const task = await Task.findById(id);
 
-  console.log("API hit for task id:", id);
+    if (!task) {
+      return NextResponse.json({ error: "Task not found" }, { status: 404 });
+    }
 
-  if (isNaN(id)) {
-    return NextResponse.json({ error: "Invalid task ID" }, { status: 400 });
+    return NextResponse.json(task);
+  } catch (error) {
+    console.error("Error fetching task:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch task" },
+      { status: 500 },
+    );
   }
+}
 
-  const task = fakeTasks.find((t) => t.id === id);
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const resolvedParams = await params;
+  const id = resolvedParams.id;
 
-  if (!task) {
-    return NextResponse.json({ error: "Task not found" }, { status: 404 });
+  try {
+    await dbConnect();
+    const body = await request.json();
+    const { completed } = body;
+
+    if (typeof completed !== "boolean") {
+      return NextResponse.json(
+        { error: "Completed must be boolean" },
+        { status: 400 },
+      );
+    }
+
+    const task = await Task.findByIdAndUpdate(
+      id,
+      { completed },
+      { new: true }, // updated document return करो
+    );
+
+    if (!task) {
+      return NextResponse.json({ error: "Task not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(task);
+  } catch (error) {
+    console.error("Error updating task:", error);
+    return NextResponse.json(
+      { error: "Failed to update task" },
+      { status: 500 },
+    );
   }
-
-  return NextResponse.json(task);
-};
+}
