@@ -50,6 +50,26 @@ export default function Home() {
     }
   };
 
+  const toggleCompleted = async (taskId: string, currentCompleted: boolean) => {
+    try {
+      const res = await fetch(`/api/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ completed: !currentCompleted }),
+      });
+
+      if (!res.ok) throw new Error('Failed to update');
+
+      const updatedTask = await res.json();
+
+      // Optimistic update
+      setTasks(tasks.map(t => t._id === taskId ? updatedTask : t));
+    } catch (err) {
+      console.error(err);
+      alert('Error updating task');
+    }
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 bg-gray-50">
       <h1 className="text-5xl md:text-6xl font-extrabold text-purple-700 mb-10 tracking-tight">
@@ -101,6 +121,12 @@ export default function Home() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
+                    <input
+                      type="checkbox"
+                      checked={task.completed}
+                      onChange={() => toggleCompleted(task._id, task.completed)}
+                      className="w-6 h-6 text-purple-600 rounded focus:ring-purple-500"
+                    />
                     <Link href={`/tasks/${task._id}`} className="flex-1">
                       <span className={`text-xl font-medium ${task.completed ? "line-through text-gray-500" : "text-gray-900"}`}>
                         {task.title}
