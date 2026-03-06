@@ -7,7 +7,7 @@ GitHub Repo: https://github.com/Dharmendra-tiwari/my-fullstack-app
 
 ![App Screenshot Light Mode](https://via.placeholder.com/800x450?text=Light+Mode+Screenshot)  
 ![App Screenshot Dark Mode](https://via.placeholder.com/800x450?text=Dark+Mode+Screenshot)  
-*(Replace these placeholder images with real screenshots from your app)*
+_(Replace these placeholder images with real screenshots from your app)_
 
 ## Features
 
@@ -41,6 +41,21 @@ GitHub Repo: https://github.com/Dharmendra-tiwari/my-fullstack-app
 ## Setup Locally
 
 1. Clone the repo:
+
    ```bash
    git clone https://github.com/Dharmendra-tiwari/my-fullstack-app.git
    cd my-fullstack-app
+
+   ```
+
+2. Install dependencies:
+   npm install
+
+3. Create .env.local and add your MongoDB connection string:
+   MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/myFullStackDB?retryWrites=true&w=majority
+
+4. Run the app:
+   npm run dev
+
+5. Open:
+   http://localhost:3000
