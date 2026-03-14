@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Task } from "./type/types";
+import { toast } from "sonner";
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -45,9 +46,13 @@ export default function Home() {
       setTasks([newTask, ...tasks]);
       setTitle("");
       setDescription("");
+
+      toast.success("Task added successfully! 🎉");
     } catch (err) {
       console.error(err);
       alert("Error adding task");
+
+      toast.error("Error adding task");
     }
   };
 
@@ -64,9 +69,17 @@ export default function Home() {
       const updatedTask = await res.json();
 
       setTasks(tasks.map((t) => (t._id === taskId ? updatedTask : t)));
+
+      toast.success(
+        updatedTask.completed
+          ? "Task marked as completed! ✅"
+          : "Task marked as pending",
+      );
     } catch (err) {
       console.error(err);
       alert("Error updating task");
+
+      toast.error("Error updating task");
     }
   };
 
@@ -86,9 +99,11 @@ export default function Home() {
       if (!res.ok) {
         throw new Error("Failed to delete");
       }
+
+      toast.success("Task deleted successfully")
     } catch (err) {
       console.error("Delete error:", err);
-      alert("Error deleting task");
+      toast.error("Error deleting task");
       setTasks(previousTasks);
     }
   };
