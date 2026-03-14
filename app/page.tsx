@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Task } from "./type/types";
 import { toast } from "sonner";
+import { track } from "@vercel/analytics";
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -46,6 +47,7 @@ export default function Home() {
       setTasks([newTask, ...tasks]);
       setTitle("");
       setDescription("");
+      track('Task Added', {titleLength: title.length})
 
       toast.success("Task added successfully! 🎉");
     } catch (err) {
